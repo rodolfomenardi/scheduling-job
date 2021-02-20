@@ -1,8 +1,11 @@
 package br.com.menardi.scheduling.service
 
+import br.com.menardi.scheduling.exceptions.InvalidDurationJobException
+import br.com.menardi.scheduling.exceptions.JobOutOfExecutionWindowException
+import br.com.menardi.scheduling.exceptions.MaxDurationException
 import br.com.menardi.scheduling.model.ExecutionWindow
 import br.com.menardi.scheduling.model.Job
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDateTime
@@ -17,7 +20,7 @@ class SchedulerJobServiceTest {
         val executionWindow = ExecutionWindow(startDateTime, endDateTime);
 
         val job = Job(1, "Emitir notas", LocalDateTime.of(2021, 10, 11, 12 ,0 , 0), Duration.ofMinutes(481));
-        Assertions.assertThrows(RuntimeException::class.java) { service.validar(executionWindow, job) };
+        assertThrows(MaxDurationException::class.java) { service.validate(executionWindow, job) };
     }
 
     @Test
@@ -30,10 +33,10 @@ class SchedulerJobServiceTest {
 
         val jobBeforeExecutionWindow = Job(1, "Emitir notas", LocalDateTime.of(2021, 10, 11, 7, 59 , 59), Duration.ofHours(1));
 
-        Assertions.assertThrows(RuntimeException::class.java) { service.validar(executionWindow, jobBeforeExecutionWindow) };
+        assertThrows(JobOutOfExecutionWindowException::class.java) { service.validate(executionWindow, jobBeforeExecutionWindow) };
 
         val jobAfterExecutionWindow = Job(1, "Emitir notas", LocalDateTime.of(2021, 10, 11, 12, 0 , 1), Duration.ofHours(1));
-        Assertions.assertThrows(RuntimeException::class.java) { service.validar(executionWindow, jobAfterExecutionWindow) };
+        assertThrows(JobOutOfExecutionWindowException::class.java) { service.validate(executionWindow, jobAfterExecutionWindow) };
     }
 
     @Test
@@ -45,6 +48,6 @@ class SchedulerJobServiceTest {
         val executionWindow = ExecutionWindow(startDateTime, endDateTime);
 
         val job = Job(1, "Emitir notas", LocalDateTime.of(2021, 10, 10, 10 ,0 , 0), Duration.ofMinutes(121));
-        Assertions.assertThrows(RuntimeException::class.java) { service.validar(executionWindow, job) };
+        assertThrows(InvalidDurationJobException::class.java) { service.validate(executionWindow, job) };
     }
 }
