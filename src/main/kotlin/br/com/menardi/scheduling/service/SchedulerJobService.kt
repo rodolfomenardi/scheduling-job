@@ -23,9 +23,14 @@ class SchedulerJobService(private val executionWindow: ExecutionWindow) {
             jobsOrdered.forEach { job ->
                 val newDuration = totalDuration.plus(job.estimatedDuration)
                 if (newDuration <= MAX_DURATION) {
-                    totalDuration = newDuration
-                    actualJobs.add(job)
-                    jobsOrderedCopy.removeIf { it.id == job.id }
+                    val estimatedEndExecution = executionWindow.start.plus(newDuration)
+                    if (!estimatedEndExecution.isAfter(job.maxDateTimeToFinish)) {
+                        if (!estimatedEndExecution.isAfter(executionWindow.end)) {
+                            totalDuration = newDuration
+                            actualJobs.add(job)
+                            jobsOrderedCopy.removeIf { it.id == job.id }
+                        }
+                    }
                 }
             }
 
@@ -58,7 +63,8 @@ class SchedulerJobService(private val executionWindow: ExecutionWindow) {
     }
 
     private fun validateExecutionWindow(job: Job) {
-        if (job.maxDateTimeToFinish.isBefore(executionWindow.start) || job.maxDateTimeToFinish.isAfter(executionWindow.end)) {
+        val windowDuration = Duration.between(executionWindow.start, executionWindow.end)
+        if (job.maxDateTimeToFinish.isBefore(executionWindow.start) || job.estimatedDuration > windowDuration) {
             val exceptionMessage = "A job \"${job.description}\" está fora da janela de execução.";
             throw JobOutOfExecutionWindowException(exceptionMessage);
         }
