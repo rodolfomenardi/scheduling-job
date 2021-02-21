@@ -14,12 +14,11 @@ class SchedulerJobService(private val executionWindow: ExecutionWindow) {
     fun getListsToExecution(jobs: List<Job>): List<List<Job>> {
         jobsValidate(jobs)
 
-        val jobsOrdered = jobs.sortedBy { it.maxDateTimeToFinish }.toMutableList()
-
         val listsToExecution = mutableListOf<List<Job>>()
 
+        val jobsOrdered = jobs.sortedBy { it.maxDateTimeToFinish }.toMutableList()
         while (jobsOrdered.isNotEmpty()) {
-            val actualJobs = getNextExecutionList(jobsOrdered)
+            val actualJobs = getValidExecutionList(jobsOrdered.toList())
             jobsOrdered.removeIf { jobOrdered ->
                 actualJobs.stream().anyMatch { actualJob -> actualJob.id == jobOrdered.id }
             }
@@ -29,12 +28,12 @@ class SchedulerJobService(private val executionWindow: ExecutionWindow) {
         return listsToExecution.toList()
     }
 
-    private fun getNextExecutionList(jobsOrdered: List<Job>): List<Job> {
+    private fun getValidExecutionList(jobs: List<Job>): List<Job> {
         var totalDuration = Duration.ZERO
         val actualJobs = mutableListOf<Job>()
 
-        jobsOrdered.forEach { job ->
-            if (queueValidate(totalDuration, job)) {
+        jobs.forEach { job ->
+            if (canAddJob(totalDuration, job)) {
                 totalDuration = totalDuration.plus(job.estimatedDuration)
                 actualJobs.add(job)
             }
@@ -55,13 +54,13 @@ class SchedulerJobService(private val executionWindow: ExecutionWindow) {
         }
     }
 
-    private fun queueValidate(newDuration: Duration, job: Job): Boolean {
+    private fun canAddJob(currentDuration: Duration, job: Job): Boolean {
         val rulesExecution = listOf(
             MaxDurationQueueValidator(maxDuration),
             MaxDateTimeToFinishJobQueueValidator(executionWindow),
             ExecutionWindowQueueValidator(executionWindow)
         )
 
-        return !rulesExecution.stream().anyMatch { validator -> !validator.validate(newDuration, job) }
+        return !rulesExecution.stream().anyMatch { validator -> !validator.validate(currentDuration, job) }
     }
 }
