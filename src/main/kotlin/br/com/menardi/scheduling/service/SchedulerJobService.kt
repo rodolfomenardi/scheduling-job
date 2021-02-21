@@ -1,80 +1,67 @@
 package br.com.menardi.scheduling.service
 
-import br.com.menardi.scheduling.exceptions.InvalidDurationJobException
-import br.com.menardi.scheduling.exceptions.JobOutOfExecutionWindowException
-import br.com.menardi.scheduling.exceptions.MaxDurationException
+import br.com.menardi.scheduling.jobValidators.JobDurationJobValidator
 import br.com.menardi.scheduling.model.ExecutionWindow
 import br.com.menardi.scheduling.model.Job
+import br.com.menardi.scheduling.queueValidators.ExecutionWindowQueueValidator
+import br.com.menardi.scheduling.queueValidators.MaxDateTimeToFinishJobQueueValidator
+import br.com.menardi.scheduling.queueValidators.MaxDurationQueueValidator
 import java.time.Duration
 
 class SchedulerJobService(private val executionWindow: ExecutionWindow) {
-    private val MAX_DURATION = Duration.ofHours(8);
+    private val maxDuration = Duration.ofHours(8)
 
     fun getListsToExecution(jobs: List<Job>): List<List<Job>> {
-        var jobsOrdered = jobs.sortedBy { it.maxDateTimeToFinish }
-        val jobsOrderedCopy = jobsOrdered.toMutableList()
+        jobsValidate(jobs)
+
+        val jobsOrdered = jobs.sortedBy { it.maxDateTimeToFinish }.toMutableList()
 
         val listsToExecution = mutableListOf<List<Job>>()
 
-        var actualJobs = mutableListOf<Job>()
-        var totalDuration = Duration.ZERO;
-
-        while (jobsOrderedCopy.size > 0) {
-            jobsOrdered.forEach { job ->
-                val newDuration = totalDuration.plus(job.estimatedDuration)
-                if (newDuration <= MAX_DURATION) {
-                    val estimatedEndExecution = executionWindow.start.plus(newDuration)
-                    if (!estimatedEndExecution.isAfter(job.maxDateTimeToFinish)) {
-                        if (!estimatedEndExecution.isAfter(executionWindow.end)) {
-                            totalDuration = newDuration
-                            actualJobs.add(job)
-                            jobsOrderedCopy.removeIf { it.id == job.id }
-                        }
-                    }
-                }
+        while (jobsOrdered.isNotEmpty()) {
+            val actualJobs = getNextExecutionList(jobsOrdered)
+            jobsOrdered.removeIf { jobOrdered ->
+                actualJobs.stream().anyMatch { actualJob -> actualJob.id == jobOrdered.id }
             }
-
             listsToExecution.add(actualJobs)
-
-            jobsOrdered = jobsOrderedCopy.toList()
-            actualJobs = mutableListOf()
-            totalDuration = Duration.ZERO;
         }
 
-        return listsToExecution.toList();
+        return listsToExecution.toList()
     }
 
-    fun validate(jobs: List<Job>) {
-        jobs.forEach {
-            validateMaxDuration(it)
-            validateExecutionWindow(it)
-            validateDurationJob(it)
+    private fun getNextExecutionList(jobsOrdered: List<Job>): List<Job> {
+        var totalDuration = Duration.ZERO
+        val actualJobs = mutableListOf<Job>()
+
+        jobsOrdered.forEach { job ->
+            if (queueValidate(totalDuration, job)) {
+                totalDuration = totalDuration.plus(job.estimatedDuration)
+                actualJobs.add(job)
+            }
         }
+
+        return actualJobs.toList()
     }
 
-    private fun validateMaxDuration(job: Job) {
-        if (job.estimatedDuration > MAX_DURATION) {
-            val estimatedDurationFormated =
-                "${job.estimatedDuration.toHoursPart()}:${job.estimatedDuration.toMinutesPart()}:${job.estimatedDuration.toSecondsPart()}";
-            val exceptionMessage =
-                "Tempo estimado de $estimatedDurationFormated da job \"${job.description}\" é maior que 8 horas.";
-            throw MaxDurationException(exceptionMessage);
-        }
-    }
+    private fun jobsValidate(jobs: List<Job>) {
+        val validations = listOf(
+            br.com.menardi.scheduling.jobValidators.MaxDurationJobValidator(maxDuration),
+            br.com.menardi.scheduling.jobValidators.ExecutionWindowJobValidator(executionWindow),
+            JobDurationJobValidator(executionWindow)
+        )
 
-    private fun validateExecutionWindow(job: Job) {
-        val windowDuration = Duration.between(executionWindow.start, executionWindow.end)
-        if (job.maxDateTimeToFinish.isBefore(executionWindow.start) || job.estimatedDuration > windowDuration) {
-            val exceptionMessage = "A job \"${job.description}\" está fora da janela de execução.";
-            throw JobOutOfExecutionWindowException(exceptionMessage);
+        jobs.forEach { job ->
+            validations.forEach { validator -> validator.validate(job) }
         }
     }
 
-    private fun validateDurationJob(job: Job) {
-        if (executionWindow.start.plus(job.estimatedDuration).isAfter(job.maxDateTimeToFinish)) {
-            val exceptionMessage =
-                "Não é possível executar a job \"${job.description}\" dentro da janela de execução no prazo máximo.";
-            throw InvalidDurationJobException(exceptionMessage);
-        }
+    private fun queueValidate(newDuration: Duration, job: Job): Boolean {
+        val rulesExecution = listOf(
+            MaxDurationQueueValidator(maxDuration),
+            MaxDateTimeToFinishJobQueueValidator(executionWindow),
+            ExecutionWindowQueueValidator(executionWindow)
+        )
+
+        return !rulesExecution.stream().anyMatch { validator -> !validator.validate(newDuration, job) }
     }
 }

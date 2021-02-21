@@ -15,9 +15,24 @@ internal class IterableSumByDurationExtensionTest {
         val seconds: Long = 10
 
         val jobs = listOf(
-            Job(1, "Importação de arquivos de fundos", LocalDateTime.of(2019, 11, 10, 12, 0, 0), Duration.ofHours(hours)),
-            Job(2, "Importação de dados da Base Legada", LocalDateTime.of(2019, 11, 11, 12, 0, 0), Duration.ofMinutes(minutes)),
-            Job(3, "Importação de dados de integração", LocalDateTime.of(2019, 11, 11, 8, 0, 0), Duration.ofSeconds(seconds))
+            Job(
+                id = 1,
+                description = "Importação de arquivos de fundos",
+                maxDateTimeToFinish = LocalDateTime.of(2019, 11, 10, 12, 0, 0),
+                estimatedDuration = Duration.ofHours(hours)
+            ),
+            Job(
+                id = 2,
+                description = "Importação de dados da Base Legada",
+                maxDateTimeToFinish = LocalDateTime.of(2019, 11, 11, 12, 0, 0),
+                estimatedDuration = Duration.ofMinutes(minutes)
+            ),
+            Job(
+                id = 3,
+                description = "Importação de dados de integração",
+                maxDateTimeToFinish = LocalDateTime.of(2019, 11, 11, 8, 0, 0),
+                estimatedDuration = Duration.ofSeconds(seconds)
+            )
         )
 
 
@@ -29,9 +44,24 @@ internal class IterableSumByDurationExtensionTest {
     @Test
     fun deveRetornarZeroSegundos() {
         val jobs = listOf(
-            Job(1, "Importação de arquivos de fundos", LocalDateTime.of(2019, 11, 10, 12, 0, 0), Duration.ZERO),
-            Job(2, "Importação de dados da Base Legada", LocalDateTime.of(2019, 11, 11, 12, 0, 0), Duration.ZERO),
-            Job(3, "Importação de dados de integração", LocalDateTime.of(2019, 11, 11, 8, 0, 0), Duration.ZERO)
+            Job(
+                id = 1,
+                description = "Importação de arquivos de fundos",
+                maxDateTimeToFinish = LocalDateTime.of(2019, 11, 10, 12, 0, 0),
+                estimatedDuration = Duration.ZERO
+            ),
+            Job(
+                id = 2,
+                description = "Importação de dados da Base Legada",
+                maxDateTimeToFinish = LocalDateTime.of(2019, 11, 11, 12, 0, 0),
+                estimatedDuration = Duration.ZERO
+            ),
+            Job(
+                id = 3,
+                description = "Importação de dados de integração",
+                maxDateTimeToFinish = LocalDateTime.of(2019, 11, 11, 8, 0, 0),
+                estimatedDuration = Duration.ZERO
+            )
         )
 
         val totalDuration = jobs.sumByDuration { it.estimatedDuration }
@@ -40,7 +70,7 @@ internal class IterableSumByDurationExtensionTest {
 
     @Test
     fun deveRetornarZeroSegundosComListaVazia() {
-        val jobs = listOf<Job>()
+        val jobs = emptyList<Job>()
 
         val totalDuration = jobs.sumByDuration { it.estimatedDuration }
         assertEquals(0, totalDuration.seconds)

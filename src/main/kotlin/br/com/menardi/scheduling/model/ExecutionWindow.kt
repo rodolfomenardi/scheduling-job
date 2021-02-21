@@ -4,4 +4,5 @@ import java.time.LocalDateTime
 
 data class ExecutionWindow(
     val start: LocalDateTime,
-    val end: LocalDateTime)
+    val end: LocalDateTime
+)
