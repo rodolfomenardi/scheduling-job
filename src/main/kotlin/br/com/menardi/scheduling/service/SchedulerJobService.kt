@@ -20,17 +20,17 @@ class SchedulerJobService(private val executionWindow: ExecutionWindow) {
 
         val jobsOrdered = jobs.sortedBy { it.maxDateTimeToFinish }.toMutableList()
         while (jobsOrdered.isNotEmpty()) {
-            val actualJobs = getValidExecutionList(jobsOrdered.toList())
+            val newJobsList = getNewExecutionList(jobsOrdered.toList())
             jobsOrdered.removeIf { jobOrdered ->
-                actualJobs.stream().anyMatch { actualJob -> actualJob.id == jobOrdered.id }
+                newJobsList.stream().anyMatch { actualJob -> actualJob.id == jobOrdered.id }
             }
-            listsToExecution.add(actualJobs)
+            listsToExecution.add(newJobsList)
         }
 
         return listsToExecution.toList()
     }
 
-    private fun getValidExecutionList(jobs: List<Job>): List<Job> {
+    private fun getNewExecutionList(jobs: List<Job>): List<Job> {
         var totalDuration = Duration.ZERO
         val actualJobs = mutableListOf<Job>()
 
