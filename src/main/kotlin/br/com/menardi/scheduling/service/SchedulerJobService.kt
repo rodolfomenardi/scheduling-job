@@ -1,6 +1,8 @@
 package br.com.menardi.scheduling.service
 
+import br.com.menardi.scheduling.jobValidators.ExecutionWindowJobValidator
 import br.com.menardi.scheduling.jobValidators.JobDurationJobValidator
+import br.com.menardi.scheduling.jobValidators.MaxDurationJobValidator
 import br.com.menardi.scheduling.model.ExecutionWindow
 import br.com.menardi.scheduling.model.Job
 import br.com.menardi.scheduling.queueValidators.ExecutionWindowQueueValidator
@@ -44,8 +46,8 @@ class SchedulerJobService(private val executionWindow: ExecutionWindow) {
 
     private fun jobsValidate(jobs: List<Job>) {
         val validations = listOf(
-            br.com.menardi.scheduling.jobValidators.MaxDurationJobValidator(maxDuration),
-            br.com.menardi.scheduling.jobValidators.ExecutionWindowJobValidator(executionWindow),
+            MaxDurationJobValidator(maxDuration),
+            ExecutionWindowJobValidator(executionWindow),
             JobDurationJobValidator(executionWindow)
         )
 
