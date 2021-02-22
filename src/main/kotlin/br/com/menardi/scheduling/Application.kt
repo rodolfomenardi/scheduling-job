@@ -24,8 +24,8 @@ fun main(args: Array<String>) {
 
 class Application {
     fun run(executionWindowFilePath: String, jobsFilePath: String, jobsResultFilePath: String) {
-        val executionWindowReader = getReader(executionWindowFilePath)
-        val jobsReader = getReader(jobsFilePath)
+        val executionWindowReader = FileReader(executionWindowFilePath)
+        val jobsReader = FileReader(jobsFilePath)
 
         val executionWindow = jsonParserService.parseFromReader<ExecutionWindow>(executionWindowReader)
         val jobs = jsonParserService.parseArrayFromReader<Job>(jobsReader)
@@ -38,13 +38,5 @@ class Application {
 
         val processedFile = File(jobsResultFilePath)
         processedFile.writeText(jsonResult)
-    }
-
-    private fun getReader(filePath: String): Reader {
-        val executionWindowFile = File(filePath)
-        if (!executionWindowFile.exists()) {
-            throw FileNotFoundException(filePath)
-        }
-        return FileReader(executionWindowFile);
     }
 }
