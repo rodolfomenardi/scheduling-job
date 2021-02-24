@@ -17,7 +17,7 @@ internal class ExecutionWindowQueueValidatorTest {
     private val validator = ExecutionWindowQueueValidator(executionWindow)
 
     @Test
-    fun deveSerValidoDuracaoIgualAJanelaDeExecucao() {
+    fun deveSerValidoDuracaoIgualAJanelaDeExecucaoComDuracaoCorrenteZerada() {
         val currentZeroDuration = Duration.ZERO
         val jobWithFourHoursDuration = Job(
             id = 1,
@@ -28,7 +28,10 @@ internal class ExecutionWindowQueueValidatorTest {
 
         val isValidCurrentDurationZero = validator.validate(currentZeroDuration, jobWithFourHoursDuration)
         assertTrue(isValidCurrentDurationZero)
+    }
 
+    @Test
+    fun deveSerValidoDuracaoIgualAJanelaDeExecucaoComDuracaoCorrenteDeUmaHora() {
         val currentOneHourDuration = Duration.ofHours(1)
         val jobWithThreeHoursDuration = Job(
             id = 1,
@@ -42,7 +45,7 @@ internal class ExecutionWindowQueueValidatorTest {
     }
 
     @Test
-    fun deveSerValidoDuracaoMenorQueAJanelaDeExecucao() {
+    fun deveSerValidoDuracaoMenorQueAJanelaDeExecucaoComDuracaoCorrenteZerada() {
         val currentZeroDuration = Duration.ZERO
         val threeHoursAndFiftyNineMinutesAndFiftyNineSeconds: Long = 14339
         val jobWithThreeHoursAndFiftyNineMinutesAndFiftyNineSecondsDuration = Job(
@@ -55,7 +58,10 @@ internal class ExecutionWindowQueueValidatorTest {
         val isValidCurrentDurationZero =
             validator.validate(currentZeroDuration, jobWithThreeHoursAndFiftyNineMinutesAndFiftyNineSecondsDuration)
         assertTrue(isValidCurrentDurationZero)
+    }
 
+    @Test
+    fun deveSerValidoDuracaoMenorQueAJanelaDeExecucaoComDuracaoCorrenteDeUmaHora() {
         val currentOneHourDuration = Duration.ofHours(1)
         val twoHoursAndFiftyNineMinutesAndFiftyNineSeconds: Long = 10739
         val jobWithTwoHoursAndFiftyNineMinutesAndFiftyNineSecondsDuration = Job(
@@ -71,7 +77,7 @@ internal class ExecutionWindowQueueValidatorTest {
     }
 
     @Test
-    fun naoDeveSerValidoDuracaoMaiorQueAJanelaDeExecucao() {
+    fun naoDeveSerValidoDuracaoMaiorQueAJanelaDeExecucaoComDuracaoCorrenteZerada() {
         val currentZeroDuration = Duration.ZERO
         val fourHoursAndOneSecond: Long = 14401
         val jobWithFourHoursAndOneSecondDuration = Job(
@@ -83,7 +89,10 @@ internal class ExecutionWindowQueueValidatorTest {
 
         val isValidCurrentDurationZero = validator.validate(currentZeroDuration, jobWithFourHoursAndOneSecondDuration)
         assertFalse(isValidCurrentDurationZero)
+    }
 
+    @Test
+    fun naoDeveSerValidoDuracaoMaiorQueAJanelaDeExecucaoComDuracaoCorrenteDeUmaHora() {
         val currentOneHourDuration = Duration.ofHours(1)
         val threeHoursAndOneSecond: Long = 14401
         val jobWithThreeHoursAndOneSecondDuration = Job(

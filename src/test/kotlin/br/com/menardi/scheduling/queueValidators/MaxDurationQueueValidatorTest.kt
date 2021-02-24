@@ -12,7 +12,7 @@ internal class MaxDurationQueueValidatorTest {
     private val validator = MaxDurationQueueValidator(maxDuration)
 
     @Test
-    fun deveValidarSeADuracaoDaJobForIgualADuracaoMaximaPermitida() {
+    fun deveValidarSeADuracaoDaJobForIgualADuracaoMaximaPermitidaComDuracaoCorreteZerada() {
         val currentZeroDuration = Duration.ZERO
         val jobWithEightHoursDuration = Job(
             id = 1,
@@ -23,7 +23,10 @@ internal class MaxDurationQueueValidatorTest {
 
         val isValidCurrentDurationZero = validator.validate(currentZeroDuration, jobWithEightHoursDuration)
         assertTrue(isValidCurrentDurationZero)
+    }
 
+    @Test
+    fun deveValidarSeADuracaoDaJobForIgualADuracaoMaximaPermitidaComDuracaoCorreteDeUmaHora() {
         val currentOneHourDuration = Duration.ofHours(1)
         val jobWithSevenHourDuration = Job(
             id = 1,
@@ -37,7 +40,7 @@ internal class MaxDurationQueueValidatorTest {
     }
 
     @Test
-    fun deveValidarSeADuracaoDaJobForMenorQueADuracaoMaximaPermitida() {
+    fun deveValidarSeADuracaoDaJobForMenorQueADuracaoMaximaPermitidaComDuracaoCorreteZerada() {
         val currentZeroDuration = Duration.ZERO
         val sevenHours59Minutes59Seconds: Long = 28799
         val jobWithSevenHours59Minutes59SecondsDuration = Job(
@@ -50,7 +53,10 @@ internal class MaxDurationQueueValidatorTest {
         val isValidCurrentDurationZero =
             validator.validate(currentZeroDuration, jobWithSevenHours59Minutes59SecondsDuration)
         assertTrue(isValidCurrentDurationZero)
+    }
 
+    @Test
+    fun deveValidarSeADuracaoDaJobForMenorQueADuracaoMaximaPermitidaComDuracaoCorreteDeUmaHora() {
         val currentOneHourDuration = Duration.ofHours(1)
         val sixHours59Minutes59Seconds: Long = 25199
         val jobWithSixHours59Minutes59SecondsDuration = Job(
@@ -66,7 +72,7 @@ internal class MaxDurationQueueValidatorTest {
     }
 
     @Test
-    fun naoDeveValidarSeADuracaoDaJobForMaiorQueADuracaoMaximaPermitida() {
+    fun naoDeveValidarSeADuracaoDaJobForMaiorQueADuracaoMaximaPermitidaComDuracaoCorreteZerada() {
         val currentZeroDuration = Duration.ZERO
         val eightHoursAndOneSecond: Long = 28801
         val jobWithEightHoursAndOneSecondDuration = Job(
@@ -78,7 +84,10 @@ internal class MaxDurationQueueValidatorTest {
 
         val isValidCurrentDurationZero = validator.validate(currentZeroDuration, jobWithEightHoursAndOneSecondDuration)
         assertFalse(isValidCurrentDurationZero)
+    }
 
+    @Test
+    fun naoDeveValidarSeADuracaoDaJobForMaiorQueADuracaoMaximaPermitidaComDuracaoCorreteComUmaHora() {
         val currentOneHourDuration = Duration.ofHours(1)
         val sevenHoursAndOneSecond: Long = 25201
         val jobWithSevenHoursAndOneSecondDuration = Job(

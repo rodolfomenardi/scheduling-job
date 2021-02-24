@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 
 class SchedulerJobServiceTest {
     @Test
-    fun deveLancarExceptionComJobForaDaJanela() {
+    fun deveLancarExceptionComJobComDataMaximaAntesDaJanela() {
         val executionWindow = ExecutionWindow(
             start = LocalDateTime.of(2021, 10, 11, 8, 0, 0),
             end = LocalDateTime.of(2021, 10, 11, 12, 0, 0)
@@ -32,6 +32,16 @@ class SchedulerJobServiceTest {
         )
 
         assertThrows(JobOutOfExecutionWindowException::class.java) { service.getListsToExecution(jobs = jobsBeforeExecutionWindow) }
+    }
+
+    @Test
+    fun deveLancarExceptionComJobComDuracaoMaiorQueAJanela() {
+        val executionWindow = ExecutionWindow(
+            start = LocalDateTime.of(2021, 10, 11, 8, 0, 0),
+            end = LocalDateTime.of(2021, 10, 11, 12, 0, 0)
+        )
+
+        val service = SchedulerJobService(executionWindow)
 
         val fourHoursAndOneSecond: Long = 14401
         val jobsAfterExecutionWindow = listOf(

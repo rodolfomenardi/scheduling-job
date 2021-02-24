@@ -17,7 +17,7 @@ internal class MaxDateTimeToFinishJobQueueValidatorTest {
     private val validator = MaxDateTimeToFinishJobQueueValidator(executionWindow)
 
     @Test
-    fun deveValidarSeADataEstimadaDeConclusaoForIgualADataMaximaDaJob() {
+    fun deveValidarSeADataEstimadaDeConclusaoForIgualADataMaximaDaJobComDuracaoCorrenteZerada() {
         val currentZeroDuration = Duration.ZERO
         val jobWithTwoHoursDuration = Job(
             id = 1,
@@ -28,7 +28,10 @@ internal class MaxDateTimeToFinishJobQueueValidatorTest {
 
         val isValidCurrentDurationZero = validator.validate(currentZeroDuration, jobWithTwoHoursDuration)
         assertTrue(isValidCurrentDurationZero)
+    }
 
+    @Test
+    fun deveValidarSeADataEstimadaDeConclusaoForIgualADataMaximaDaJobComDuracaoCorrenteDeUmaHora() {
         val currentOneHourDuration = Duration.ofHours(1)
         val jobWithOneHourDuration = Job(
             id = 1,
@@ -42,7 +45,7 @@ internal class MaxDateTimeToFinishJobQueueValidatorTest {
     }
 
     @Test
-    fun deveValidarSeADataEstimadaDeConclusaoForMenorQueADataMaximaDaJob() {
+    fun deveValidarSeADataEstimadaDeConclusaoForMenorQueADataMaximaDaJobComDuracaoCorrenteZerada() {
         val currentZeroDuration = Duration.ZERO
         val oneHourAndFiftyNineMinutesAndFiftyNineSeconds: Long = 7199
         val jobWithOneHourAndFiftyNineMinutesAndFiftyNineSecondsDuration = Job(
@@ -55,7 +58,10 @@ internal class MaxDateTimeToFinishJobQueueValidatorTest {
         val isValidCurrentDurationZero =
             validator.validate(currentZeroDuration, jobWithOneHourAndFiftyNineMinutesAndFiftyNineSecondsDuration)
         assertTrue(isValidCurrentDurationZero)
+    }
 
+    @Test
+    fun deveValidarSeADataEstimadaDeConclusaoForMenorQueADataMaximaDaJobComDuracaoCorrenteDeUmaHora() {
         val currentOneHourDuration = Duration.ofHours(1)
         val fiftyNineMinutesAndFiftyNineSeconds: Long = 3599
         val jobWithFiftyNineMinutesAndFiftyNineSecondsDuration = Job(
@@ -71,7 +77,7 @@ internal class MaxDateTimeToFinishJobQueueValidatorTest {
     }
 
     @Test
-    fun naoDeveValidarSeADataEstimadaDeConclusaoForMaiorQueADataMaximaDaJob() {
+    fun naoDeveValidarSeADataEstimadaDeConclusaoForMaiorQueADataMaximaDaJobComDuracaoCorrenteZerada() {
         val currentZeroDuration = Duration.ZERO
         val twoHoursAndOneSecond: Long = 7201
         val jobWithTwoHoursAndOneSecondDuration = Job(
@@ -83,7 +89,10 @@ internal class MaxDateTimeToFinishJobQueueValidatorTest {
 
         val isValidCurrentDurationZero = validator.validate(currentZeroDuration, jobWithTwoHoursAndOneSecondDuration)
         assertFalse(isValidCurrentDurationZero)
+    }
 
+    @Test
+    fun naoDeveValidarSeADataEstimadaDeConclusaoForMaiorQueADataMaximaDaJobComDuracaoCorrenteDeUmaHora() {
         val currentOneHourDuration = Duration.ofHours(1)
         val oneHourAndOneSecond: Long = 3601
         val jobWithOneHourAndOneSecondDuration = Job(

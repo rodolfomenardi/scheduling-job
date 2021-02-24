@@ -18,7 +18,7 @@ internal class ExecutionWindowJobValidatorTest {
     private val validator = ExecutionWindowJobValidator(executionWindow)
 
     @Test
-    fun deveLancarExceptionComJobForaDaJanela() {
+    fun deveLancarExceptionComJobAntesDaJanela() {
         val oneHour: Long = 1
         val jobBeforeExecutionWindow = Job(
             id = 1,
@@ -28,12 +28,15 @@ internal class ExecutionWindowJobValidatorTest {
         )
 
         assertThrows(JobOutOfExecutionWindowException::class.java) { validator.validate(job = jobBeforeExecutionWindow) }
+    }
 
+    @Test
+    fun deveLancarExceptionComJobComDuracaoMaiorQueAJanela() {
         val fourHoursAndOneSecond: Long = 14401
         val jobAfterExecutionWindow = Job(
             id = 1,
             description = "Emitir notas",
-            maxDateTimeToFinish = LocalDateTime.of(2021, 10, 11, 12, 0, 0),
+            maxDateTimeToFinish = LocalDateTime.of(2021, 10, 11, 14, 0, 0),
             estimatedDuration = Duration.ofSeconds(fourHoursAndOneSecond)
         )
 
