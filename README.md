@@ -4,10 +4,14 @@
 
 - Clonar este repositório;
 - Abrir o bash no diretório raiz do projeto;
-- Para executar no Windows, rode o comando `gradlew.bat run --args="pathToExecutionWindowFile pathToJobsFile pathToResultFile"` substituindo os parametros pelos respectivos patchs dos arquivos JSON.
-- Para executar no Linux, rode o comando `./gradlew run --args="pathToExecutionWindowFile pathToJobsFile pathToResultFile"` substituindo os parametros pelos respectivos patchs dos arquivos JSON.
+- Para executar no Windows, rode o comando `gradlew run --args="pathToExecutionWindowFile pathToJobsFile pathToResultFile"` substituindo os parametros pelos respectivos patchs dos arquivos JSON. Ex.: `gradlew run --args="C:\temp\executionWindows.json C:\temp\jobs.json C:\temp\result.json"`;
+- Para executar no Linux, rode o comando `./gradlew run --args="pathToExecutionWindowFile pathToJobsFile pathToResultFile"` substituindo os parametros pelos respectivos patchs dos arquivos JSON. Ex.: `./gradlew run --args="/temp/executionWindows.json /temp/jobs.json /temp/result.json"`;
 
 ## Exemplos dos arquivos
+
+- Abrir o bash no diretório raiz do projeto;
+- Para executar no windows, rode o comando `gradlew test`
+- Para executar no Linux, rode o comando `./gradlew test`
 
 #### ExecutionWindow:
 
