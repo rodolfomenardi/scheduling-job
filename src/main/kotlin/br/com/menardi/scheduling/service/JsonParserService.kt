@@ -4,6 +4,7 @@ import br.com.menardi.scheduling.annotations.JsonDuration
 import br.com.menardi.scheduling.annotations.JsonLocalDateTime
 import br.com.menardi.scheduling.converters.DurationConverter
 import br.com.menardi.scheduling.converters.LocalDateTimeConverter
+import br.com.menardi.scheduling.extensions.toPrettyJsonString
 import com.beust.klaxon.Klaxon
 import com.beust.klaxon.KlaxonException
 import java.io.Reader
@@ -24,5 +25,5 @@ class JsonParserService {
         Klaxon()
             .fieldConverter(JsonDuration::class, DurationConverter())
             .fieldConverter(JsonLocalDateTime::class, LocalDateTimeConverter())
-            .toJsonString(jsonObject)
+            .toPrettyJsonString(jsonObject)
 }

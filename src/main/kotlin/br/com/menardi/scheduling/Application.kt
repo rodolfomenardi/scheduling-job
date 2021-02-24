@@ -24,8 +24,8 @@ fun main(args: Array<String>) {
 
 class Application {
     fun run(executionWindowFilePath: String, jobsFilePath: String, jobsResultFilePath: String) {
-        val executionWindowReader = FileReader(executionWindowFilePath)
-        val jobsReader = FileReader(jobsFilePath)
+        val executionWindowReader = FileReader(executionWindowFilePath, Charsets.UTF_8)
+        val jobsReader = FileReader(jobsFilePath, Charsets.UTF_8)
 
         val executionWindow = jsonParserService.parseFromReader<ExecutionWindow>(executionWindowReader)
         val jobs = jsonParserService.parseArrayFromReader<Job>(jobsReader)
